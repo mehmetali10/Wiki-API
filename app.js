@@ -15,7 +15,8 @@ app.use(bodyParser.urlencoded({
 
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/wikiDB");
+mongoose.connect("mongodb://localhost:27017/wikiDB",{
+});
 
 const articleSchema = {
     title: String,
@@ -91,26 +92,26 @@ app.route("/articles/:articleTitle")
         const articleTitle = req.params.articleTitle;
         Article.findOne({title: articleTitle}, function(err, foundArticle){
             if(foundArticle)
-                res.render(foundArticle);
+                res.send(foundArticle);
             else    
                 res.send("No article founds");
         });
     })
     .put((req,res)=>{
-        Article.updateOne(
+         Article.updateOne(
             {title: req.params.articleTitle}, //conditions
             {
                 title: req.body.title, 
-                content: req.body.content 
-            },  //updates
-            {overwrite: true},
-            function(err){
-                if(!err)
-                    res.send("succesfully update article");
-                else
-                    res.send(err);
-            }
-        );
+                content: req.body.content
+            },              
+            function (err) {
+                if (err){
+                    res.send(err)
+                }
+                else{
+                    res.send("Updated Docs");
+                }
+            });
     })
     .patch().delete()
 
