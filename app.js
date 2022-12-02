@@ -47,7 +47,11 @@ const articles = [
 app.route("/articles")
     .get(function(req,res){
         Article.count({}, function(err, count){
-            if(!err && count == 0)
+            if(err)
+            {
+                res.send(err);
+            }
+            else if(count == 0)
             {
                 Article.insertMany(articles);
                 res.redirect("/articles");
@@ -97,6 +101,7 @@ app.route("/articles/:articleTitle")
                 res.send("No article founds");
         });
     })
+
     .put((req,res)=>{
          Article.updateOne(
             {title: req.params.articleTitle}, //conditions
@@ -113,7 +118,30 @@ app.route("/articles/:articleTitle")
                 }
             });
     })
-    .patch().delete()
+
+    .patch(function(req, res){
+        const ud = req.body;
+        Article.findByIdAndUpdate(
+            {_id: req.params.id},
+            {ud },
+            {new: true},
+            function(err, article){
+                if(err)
+                    res.send(err);
+                else    
+                    res.send("patch success " + article);
+            }
+        )
+    })
+    
+    .delete(function(req, res){
+        Article.deleteOne({title: req.params.articleTitle}, function(err){
+            if(err)
+                res.send(err);
+            else
+                res.send("succes delete");
+        })
+    })
 
 
 
